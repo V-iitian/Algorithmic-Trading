@@ -3,4 +3,4 @@ This is the repository that contains all the codes that i implemented during my 
 
 
 ## Python for finance 
-This contains the jupytr files which i created while reading python for fincance book by Yves Hilpisch
+This contains the jupyter files which i created while reading python for fincance book by Yves Hilpisch
