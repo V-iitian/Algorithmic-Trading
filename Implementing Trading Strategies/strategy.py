@@ -75,7 +75,7 @@ class SMACrossover(bt.Strategy):
         if (self.crossover < 0 or (self.rsi[0]>70 and self.rsi[-1]<70)) and (self.data.volume[0]>self.volume_avg):
             self.log('Sell Create, %.2f' %self.data.close[0])
             self.close()  # Sell our current holdings
-        if self.rsi[-2]<30 and self.rsi[-1]<30 and self.rsi[0]<30 and (self.data.volume[0]>self.volume_avg):
+        if self.rsi[-2]<30 and self.rsi[-1]<self.rsi[-2] and self.rsi[0]<self.rsi[-1] and (self.data.volume[0]>self.volume_avg):
             self.log('Sell Create, %.2f' %self.data.close[0])
             self.close()  # Sell our current holdings
 
@@ -106,16 +106,17 @@ if __name__ == '__main__':
 
     # NOTE: You will need to load a data feed here for the engine to process
     # Example using a local CSV file:
-
-    data = bt.feeds.GenericCSVData(dataname='Oracle_Clean.csv',
+    data = bt.feeds.GenericCSVData(dataname='RELIANCE.csv',
                                    dtformat='%Y-%m-%d',
+                                   separators=',',
+                                   openinterest = -1,
                                    headers = True,
                                    reverse=False)
-    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
+    cerebro.addsizer(bt.sizers.FixedSize, stake=1)
     cerebro.adddata(data)
 
     # Set starting capital
-    initial_cash = 1000
+    initial_cash = 2000
     cerebro.broker.setcash(initial_cash)
     cerebro.broker.setcommission(commission=0.0003)
     # Run the backtest
