@@ -16,7 +16,6 @@ class IntradayCommissionStrategy(bt.Strategy):
         if open_date != close_date:
             # Backtrader tracks the total commission charged for both legs of this trade
             refund_amount = trade.commission
-            
             # Add the cash back to the broker balance
             self.broker.add_cash(refund_amount)
             
