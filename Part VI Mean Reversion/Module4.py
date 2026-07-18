@@ -26,4 +26,4 @@ def simulate_acf_illusion():
     plot_acf(stationary_weak, ax=axes[2], lags=40, title="Weak Stationary")
     plt.show()
 
-simulate_acf_illusion()
+simulate_acf_illusion
