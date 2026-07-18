@@ -7,7 +7,7 @@ It contains all the data files which i used in my codes in the subsequent folder
 ## Python for finance 
 This contains the jupyter files which i created while reading python for fincance book by Yves Hilpisch
 
-## Inndividual Indicators codes 
+## Individual Indicators codes 
 this contain the code of individual indicators implemented on a data 
 
 ## Implementing Trading Strategies 
