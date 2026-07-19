@@ -10,4 +10,5 @@ All files is based on the sequence of my end term report contents pages and each
 
 ## Chats which i have done with gemini while doing this learning project 
 1st one :- <https://share.gemini.google/ytcNvzO45tFS>
-2nd ont :- <https://share.gemini.google/kUaFWRR4axOo>
+
+2nd one :- <https://share.gemini.google/kUaFWRR4axOo>
