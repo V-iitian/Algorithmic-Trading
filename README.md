@@ -6,3 +6,9 @@ It contains all the data files which i used in my codes in the subsequent folder
 
 ## Part I,III,IV,V,VI
 All files is based on the sequence of my end term report contents pages and each directory contains code correspondng to its part in the end term report 
+
+
+## Chats which i have done with gemini while doing this learning project 
+1st one :- <https://share.gemini.google/ytcNvzO45tFS>
+
+2nd one :- <https://share.gemini.google/kUaFWRR4axOo>
