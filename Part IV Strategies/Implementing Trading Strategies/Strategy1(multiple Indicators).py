@@ -51,7 +51,8 @@ class ZerodhaCommission(bt.CommInfoBase):
 class Strategy1(bt.Strategy):
 
     # all the parameters value that we are using, You can tweek values directly from here for optimising 
-    params = (('short_ma',9),('long_ma',50),('signal',25),('ATR_period',10))
+    params = (('short_ma',5),('long_ma',50),('ATR_period',14),('adx_period', 10),
+        ('adx_threshold', 10))
     
     def log(self,txt,dt=None):
         dt = dt or self.datas[0].datetime.date(0)
@@ -84,15 +85,17 @@ class Strategy1(bt.Strategy):
         self.dataopen = self.datas[0].open
         self.Volume = self.datas[0].volume
         ### All Indicators 
-        ## macd indicator 
-        self.macd = bt.indicators.MACD(self.dataclose,period_me1 = self.params.short_ma , period_me2 = self.params.long_ma, period_signal = self.params.signal ) 
+        ## macd indicator  
         ## ATR indicator for Stop loss and volatiltiy check 
+        self.adx = bt.indicators.AverageDirectionalMovementIndex(self.datas[0],period = self.params.adx_period)
         self.atr = bt.indicators.AverageTrueRange(self.datas[0],period = self.params.ATR_period)
         ## rsi for momentum and works well in sideways market 
         self.rsi = bt.indicators.RSI(self.dataclose,period = self.params.ATR_period)
         ## for trend confirmation
+        self.MMA = bt.indicators.MovingAverageSimple(self.dataclose,period =14)
         self.MA = bt.indicators.MovingAverageSimple(self.dataclose,period = self.params.short_ma)
         self.MA2 = bt.indicators.MovingAverageSimple(self.dataclose,period = self.params.long_ma)
+        self.crossover = bt.indicators.CrossOver(self.MA,self.MA2)
         self.VolumeMA = bt.indicators.MovingAverageSimple(self.datas[0].volume,period = 14)
         #initialising trailing loss 
         ## initialising order variable 
@@ -110,58 +113,27 @@ class Strategy1(bt.Strategy):
         #First let's create a strategy that will implement one Order at a time 
         if not self.position:
             # Buy Signal 
-            if self.macd.macd[0]>0 and self.macd.macd[-1]<0 :
-                if Volatilty_ > 5:
-                    return
-                if Volatilty_<1:
-                    return
-                if self.dataclose[0]<= Bottom*1.2:
-                    if self.dataclose[0]>self.MA2:
-                        self.order = self.buy()
-                if self.dataclose[0]>=Up*0.8:
-                    #Strong Uptrend Coming 
-                    # check for Volume MA 
-                    if self.Volume>= self.VolumeMA:
-                        if self.dataclose[0]>=self.MA2:
-                            self.order = self.buy(size=10)
+            if self.adx >= self.params.adx_threshold:
+                if self.crossover[0]>0:
+                    if Volatilty_>5:
+                        self.order = self.buy(size=10)
                     else:
-                        if self.dataclose[0]>=self.MA2:
-                            self.order = self.buy(size=5)
-            elif self.macd.macd[0]<0 and self.macd.macd[-1]>0:
-                if self.dataclose[0]>=Up*0.9:
-                    if self.dataclose[0]<=self.MA2:
-                        self.order = self.sell()
-                elif self.dataclose[0]<=1.2*Bottom:
-                    #Strong Downtrend 
-                    # check for Volume MA 
-                    if self.Volume>= self.VolumeMA:
-                        if self.dataclose[0]<=self.MA2:
-                            self.order = self.sell(size=10)
+                        self.order = self.buy(size=5)
+                elif self.crossover<0:
+                    if Volatilty_>5:
+                        self.order = self.sell(size=10)
                     else:
-                        if self.dataclose[0]<= self.MA2:
-                            self.order = self.sell(size=5)
-        elif self.position:
-            # i am long currently
-            if Volatilty_>5:
-                self.order = self.close()
-            elif self.position.size>0:
-                if self.macd.macd[0]<0 and self.macd.macd[-1]>0:
-                    self.order = self.close()
-                    self.log('Close Executed')
-                # stoploss type thing
-                if self.dataclose[0]<0.8*Bottom:
-                    self.order = self.close()
-                    self.log('Close Executed')
+                        self.order = self.sell(size=5)
             
-            elif self.position.size<0:
-                if self.macd.macd[0]>0 and self.macd.macd[-1]<0:
+        elif self.position and self.adx>self.params.adx_threshold:
+            # i am long currently
+            
+            if self.position.size<0:
+                if self.MMA[0]>self.MMA[-2]+5:
                     self.order = self.close()
-                    self.log('Close Executed')
-                
-                if self.dataclose[0]>1.2*Up:
+            elif self.position.size>0:
+                if self.MMA[0]<self.MMA[-2]-5:
                     self.order = self.close()
-                    self.log('Close Executed')
-                
             
 
 if __name__ == '__main__':
@@ -169,7 +141,7 @@ if __name__ == '__main__':
         # data processing
         # we will be using 2020-2024 data for optimising or tweaking our strategy and then we will backtest it on 2025-26 data 
         data = bt.feeds.GenericCSVData(
-            dataname = 'RELIANCE.csv',
+            dataname = 'Reliance_20_to_24.csv',
             headers = True,
             separators =',',
             datetime = 0, close = 1,open=2,high=3,low=4,volume = 5,
